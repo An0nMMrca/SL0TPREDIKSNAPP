@@ -1,43 +1,40 @@
 [app]
-
-# General
-title = SL0TPREDIKSNAPP
-package.name = slotprediksnapp
-package.domain = org.example
+title = G4mbler Predictor
+package.name = g4mbler
+package.domain = org.kartice.ai
 source.dir = .
-version = 1.0.0
-orientation = portrait
-fullscreen = 1
-
-# Entry point
-source.include_exts = py,png,jpg,kv,atlas,ttf
-android.entrypoint = org.kivy.android.PythonActivity
-copy_mainsource = 1
-
-# Requirements (Python packages and Android dependencies)
-requirements = python3,kivy,cython,numpy,scikit-learn
-
-# Presplash and icon
+source.include_exts = py,png,jpg,kv,atlas,ttf,db
+version = 1.0
+requirements = python3,kivy,numpy,scikit-learn,sqlite3
 icon.filename = icons/app_icon.png
 presplash.filename = icons/splash.png
+fullscreen = 1
 
-# Include assets (card images etc.)
-include_patterns = icons/*.png
+[buildozer]
+log_level = 2
+warn_on_root = 1
 
-# Permissions
+[app.android]
+android.api = 34
+android.minapi = 21
+android.ndk = 25b
+android.sdk = 24
+android.ndk_path = 
+android.sdk_path = 
+android.gradle_dependencies = 
+android.gradle_plugins = 
+
+android.build_tools_version = 36.0.0
+
+# Include your icons folder
+android.add_assets = icons/
+
+# Permissions if needed
 android.permissions = INTERNET
 
-# Android SDK/API setup
-android.api = 33
-android.minapi = 21
-android.build_tools_version = 33.0.0
-android.archs = arm64-v8a,armeabi-v7a
+# Architecture
+android.archs = armeabi-v7a, arm64-v8a
 
-# Log level
-log_level = 2
-
-# Build directory
-[buildozer]
-build_dir = .buildozer
-warn_on_root = 1
+# (optional) Add extra .py files or folders
+# source.include_patterns = assets/*,data/*
 
