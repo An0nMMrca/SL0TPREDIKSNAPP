@@ -1,3 +1,6 @@
+python3
 kivy
+cython
 numpy
 scikit-learn
+sqlite3
