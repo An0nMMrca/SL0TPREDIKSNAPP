@@ -1,41 +1,52 @@
-name: Android APK Build
+name: Build APK using Buildozer
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build APK using Buildozer
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y zip unzip openjdk-17-jdk python3-pip python3-setuptools \
-            python3-wheel python3-dev build-essential git libffi-dev libssl-dev \
-            libsqlite3-dev libjpeg-dev zlib1g-dev
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-          pip install --upgrade pip
-          pip install Cython
-          pip install buildozer
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential zip unzip openjdk-17-jdk python3-pip
+        pip install --upgrade pip
+        pip install cython virtualenv buildozer
 
-      - name: Accept Android SDK Licenses
-        run: |
-          mkdir -p ~/.android && touch ~/.android/repositories.cfg
-          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
+    - name: Set up Android SDK & Accept Licenses
+      run: |
+        mkdir -p $HOME/android-sdk/cmdline-tools
+        cd $HOME/android-sdk/cmdline-tools
+        curl -O https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip -q commandlinetools-linux-*.zip
+        rm commandlinetools-linux-*.zip
+        mv cmdline-tools latest
+        export ANDROID_SDK_ROOT=$HOME/android-sdk
+        export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
 
-      - name: Build APK
-        run: |
-          buildozer android debug
+        mkdir -p ~/.android && touch ~/.android/repositories.cfg
+        yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: cardai-apk
-          path: bin/*.apk
+    - name: Build APK with Buildozer
+      run: |
+        export ANDROID_SDK_ROOT=$HOME/android-sdk
+        export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+        buildozer android debug
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: slot-predictor-apk
+        path: bin/*.apk
