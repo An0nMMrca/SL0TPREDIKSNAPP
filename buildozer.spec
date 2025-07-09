@@ -1,42 +1,31 @@
 [app]
-title = CardPredictor
-package.name = cardpredictor
-package.domain = org.karta.predikcija
+title = SlotPredikcija
+package.name = slotpredikcija
+package.domain = org.slot.predikcija
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
-source.include_patterns = assets/*
-
 version = 1.0
-requirements = python3,kivy,numpy,scikit-learn
+requirements = python3,kivy,sqlite3,numpy,scikit-learn
 orientation = portrait
-
 fullscreen = 1
-icon.filename = assets/icon.png
-presplash.filename = assets/splash.png
-
-# Android permissions
-android.permissions = INTERNET
-
-# Entry point
-entrypoint = main.py
-
-# Android specific
-android.api = 33
-android.minapi = 21
-android.sdk = 33
-android.ndk = 25b
-android.ndk_api = 21
-android.private_storage = True
-
-# This enables OpenGL ES 2.0 which is needed for Kivy
-android.opengl_es2 = True
-
-# Hide the title bar
-android.hide_title = 1
-
-# Enable logcat
-log_level = 2
 
 [buildozer]
 log_level = 2
 warn_on_root = 1
+android.api = 33
+android.sdk = 33
+android.ndk = 25b
+android.ndk_path = 
+android.sdk_path = 
+android.build_tools = 33.0.2
+android.arch = armeabi-v7a
+android.minapi = 21
+android.permissions = INTERNET
+android.gradle_dependencies =
+android.use_android_native_libs = 1
+p4a.branch = master
+p4a.source_dir = 
+p4a.local_recipes = 
+p4a.whitelist = 
+p4a.hostpython = 
+android.debug = 1
