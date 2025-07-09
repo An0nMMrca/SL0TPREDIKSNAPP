@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-apk:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -15,61 +15,37 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            python3-pip \
-            git \
-            unzip \
-            zip \
-            openjdk-17-jdk \
-            libffi-dev \
-            libssl-dev \
-            libjpeg-dev \
-            libncurses5 \
-            libncursesw5 \
-            libtinfo5 \
-            build-essential \
-            ccache \
-            tar \
-            wget
+          sudo apt-get install -y python3-pip git unzip openjdk-17-jdk tar wget curl zip
 
-    
-            
-            
+      - name: Upgrade pip and install Buildozer and dependencies
+        run: |
+          python3 -m pip install --upgrade pip setuptools wheel
+          pip install --upgrade buildozer cython kivy numpy scikit-learn
 
-      - name: Set up Android SDK
+      - name: Setup Android SDK cmdline-tools and accept licenses
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
-          curl -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          curl -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           unzip -q commandlinetools.zip
           rm commandlinetools.zip
           mv cmdline-tools latest
-
-      - name: Accept Android licenses and install required packages
-        run: |
           export ANDROID_SDK_ROOT=$HOME/android-sdk
-          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --licenses
-          sdkmanager --sdk_root=${ANDROID_SDK_ROOT} \
-            "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;33.0.0" \
-            "cmake;3.22.1"
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
       - name: Set environment variables
         run: |
-          echo "ANDROIDSDK=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "PATH=$HOME/android-sdk/platform-tools:$HOME/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$HOME/android-sdk/emulator:$PATH" >> $GITHUB_ENV
 
-      - name: Copy icons folder (include PNGs)
+      - name: Build APK with Buildozer (with retry)
         run: |
-          mkdir -p icons
-          
-      - name: Build APK with Buildozer
-        run: |
-          buildozer android debug
+          for i in 1 2 3; do
+            python3 -m buildozer android debug && break || sleep 60
+          done
 
-      - name: List APKs
+      - name: List generated APKs
         run: ls -lh bin || true
 
       - name: Upload APK artifact
