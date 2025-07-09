@@ -8,73 +8,56 @@ jobs:
   build-apk:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_HOME: $HOME/android-sdk
+      ANDROID_SDK_ROOT: $HOME/android-sdk
+      PATH: $HOME/.local/bin:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH
+
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
+      - name: 🧰 Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            python3-pip \
-            git \
-            unzip \
-            openjdk-17-jdk \
-            wget \
-            tar \
-            zip \
-            libncurses5 \
-            libffi-dev \
-            libssl-dev \
-            libsqlite3-dev \
-            libpng-dev \
-            libjpeg-dev \
-            zlib1g-dev \
-            libgl1-mesa-dev \
-            libgles2-mesa-dev \
-            libgtk-3-dev \
-            libnss3 \
-            libxss1 \
-            libbz2-dev \
-            libc6-dev
+            python3-pip git unzip zip tar curl openjdk-17-jdk \
+            libffi-dev libssl-dev libsqlite3-dev libpng-dev \
+            libjpeg-dev zlib1g-dev libgl1-mesa-dev libgles2-mesa-dev \
+            libgtk-3-dev libnss3 libxss1 libasound2t64 libbz2-dev libc6-dev \
+            libncurses6
 
-      - name: Upgrade pip & install Python dependencies
+      - name: 📦 Upgrade pip & install Python packages
         run: |
           python3 -m pip install --upgrade pip setuptools wheel
-          pip install --upgrade buildozer Cython numpy scikit-learn kivy
+          pip install buildozer cython kivy numpy scikit-learn
 
-      - name: Download and install Android SDK Command Line Tools
+      - name: 📦 Install Android SDK Commandline Tools
         run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O sdk.zip
-          unzip sdk.zip
-          rm sdk.zip
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
+          curl -o tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip tools.zip
+          rm tools.zip
           mv cmdline-tools latest
 
-      - name: Accept Android SDK licenses and install SDK components
+      - name: ✅ Accept Android SDK Licenses
         run: |
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+
+      - name: 📥 Install Android SDK packages
+        run: |
           $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
-            "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;33.0.0"
+            "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
-      - name: Set environment variables
+      - name: 🚧 Build APK with Buildozer (with retry logic)
         run: |
-          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+          buildozer -v android debug || (sleep 30 && buildozer -v android debug) || (sleep 60 && buildozer -v android debug)
 
-      - name: Build APK with Buildozer (with retry)
-        run: |
-          buildozer android debug
-
-      - name: List APKs
+      - name: 📂 List APKs
         run: ls -lh bin || true
 
-      - name: Upload APK artifact
+      - name: ⬆ Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: slotprediksnapp-apk
