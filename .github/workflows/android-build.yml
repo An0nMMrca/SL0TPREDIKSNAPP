@@ -20,9 +20,14 @@ jobs:
           sudo apt install -y zip unzip openjdk-17-jdk python3-pip python3-setuptools \
             python3-wheel python3-dev build-essential git libffi-dev libssl-dev \
             libsqlite3-dev libjpeg-dev zlib1g-dev
+
           pip install --upgrade pip
           pip install Cython
           pip install buildozer
+
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | buildozer android accept_sdk_license
 
       - name: Build APK
         run: |
