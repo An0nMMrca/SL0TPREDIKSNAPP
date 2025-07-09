@@ -26,7 +26,7 @@ jobs:
           python3 -m pip install --upgrade pip setuptools wheel
           pip install --upgrade buildozer cython numpy scikit-learn
 
-      - name: Download Android NDK manually (workaround for ValueError: read of closed file)
+      - name: Download Android NDK manually (Workaround for ValueError: read of closed file)
         run: |
           mkdir -p $HOME/.buildozer/android/platform
           cd $HOME/.buildozer/android/platform
