@@ -2,11 +2,9 @@ name: Build Android APK with Buildozer
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build-apk:
