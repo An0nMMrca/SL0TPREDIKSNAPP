@@ -33,10 +33,10 @@ jobs:
             wget
 
       - name: Install Python dependencies
-         run: |
-           python3 -m pip install --upgrade pip
-           pip install --upgrade setuptools wheel
-           pip install --upgrade buildozer cython
+  run: |
+    python3 -m pip install --upgrade pip
+    pip install --upgrade setuptools wheel
+    pip install --upgrade buildozer cython
             
             
 
