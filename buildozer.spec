@@ -1,5 +1,7 @@
 [app]
-
+...
+# (bool) Include Cython (for compiling Python extensions)
+cython = true
 title = SL0TPREDIKSNAPP
 package.name = slotprediksnapp
 package.domain = org.example
