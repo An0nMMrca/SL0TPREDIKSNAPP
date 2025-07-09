@@ -27,7 +27,8 @@ jobs:
 
       - name: Accept Android SDK Licenses
         run: |
-          yes | buildozer android accept_sdk_license
+          mkdir -p ~/.android && touch ~/.android/repositories.cfg
+          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Build APK
         run: |
