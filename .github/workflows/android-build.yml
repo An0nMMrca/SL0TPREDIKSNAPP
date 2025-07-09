@@ -66,8 +66,7 @@ jobs:
       - name: Copy icons folder (include PNGs)
         run: |
           mkdir -p icons
-          cp -r icons/ .
-
+          
       - name: Build APK with Buildozer
         run: |
           buildozer android debug
