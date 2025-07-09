@@ -20,14 +20,12 @@ jobs:
             git \
             unzip \
             openjdk-17-jdk \
-            libncurses5 \
             libstdc++6 \
             zlib1g-dev \
             libffi-dev \
             libssl-dev \
             libsqlite3-dev \
             libjpeg-dev \
-            libandroid-support-dev \
             autoconf \
             libtool \
             build-essential \
