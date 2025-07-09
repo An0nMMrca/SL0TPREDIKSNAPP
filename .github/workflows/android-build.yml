@@ -1,41 +1,31 @@
-name: Build Android APK with Buildozer
+name: Android Build
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # Promijenite na vašu glavnu granu ako nije 'main'
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.10
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        sudo apt-get update
+        sudo apt-get install -y python3-pip python3-setuptools python3-wheel
+        pip install --upgrade pip
         pip install buildozer cython
 
-    - name: Accept Android SDK licenses
-      run: yes | sdkmanager --licenses || true
-
-    - name: Initialize Buildozer (first run to set up folders)
+    - name: Run Buildozer
       run: |
-        buildozer android debug || echo "First pass to initialize folders"
-
-    - name: Build APK
-      run: buildozer android debug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: slotprediksnapp-apk
-        path: bin/*.apk
+        buildozer init
+        buildozer -v android debug
