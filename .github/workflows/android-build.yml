@@ -15,37 +15,62 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip git unzip openjdk-17-jdk tar wget
+          sudo apt-get install -y \
+            python3-pip \
+            git \
+            unzip \
+            openjdk-17-jdk \
+            wget \
+            tar \
+            zip \
+            libncurses5 \
+            libffi-dev \
+            libssl-dev \
+            libsqlite3-dev \
+            libpng-dev \
+            libjpeg-dev \
+            zlib1g-dev \
+            libgl1-mesa-dev \
+            libgles2-mesa-dev \
+            libgtk-3-dev \
+            libnss3 \
+            libxss1 \
+            libasound2 \
+            libbz2-dev \
+            libc6-dev
 
-      - name: Install Buildozer and requirements
+      - name: Upgrade pip & install Python dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools wheel
-          pip install --upgrade buildozer kivy cython numpy scikit-learn
+          pip install --upgrade buildozer Cython numpy scikit-learn kivy
 
-      
-      - name: Accept Android SDK licenses and install SDK components
+      - name: Download and install Android SDK Command Line Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.0"
-          unzip -q commandlinetools.zip
-          rm commandlinetools.zip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O sdk.zip
+          unzip sdk.zip
+          rm sdk.zip
           mv cmdline-tools latest
+
+      - name: Accept Android SDK licenses and install SDK components
+        run: |
           export ANDROID_SDK_ROOT=$HOME/android-sdk
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.0"
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
+            "platform-tools" \
+            "platforms;android-33" \
+            "build-tools;33.0.0"
 
       - name: Set environment variables
         run: |
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/ndk" >> $GITHUB_ENV
-          echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$HOME/android-sdk/emulator:$PATH" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
       - name: Build APK with Buildozer (with retry)
         run: |
-          for i in 1 2 3; do
-            buildozer -v android debug && break || sleep 60
-          done
+          buildozer android debug
 
       - name: List APKs
         run: ls -lh bin || true
