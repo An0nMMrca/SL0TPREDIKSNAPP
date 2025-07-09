@@ -19,12 +19,20 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip git unzip openjdk-17-jdk tar
+          sudo apt-get install -y python3-pip git unzip openjdk-17-jdk tar wget
 
       - name: Install Buildozer and dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools wheel
           pip install --upgrade buildozer cython numpy scikit-learn
+
+      - name: Download Android NDK manually (workaround for ValueError: read of closed file)
+        run: |
+          mkdir -p $HOME/.buildozer/android/platform
+          cd $HOME/.buildozer/android/platform
+          wget -c https://dl.google.com/android/repository/android-ndk-r25.2.9519653-linux.zip
+          unzip -q android-ndk-r25.2.9519653-linux.zip
+          mv android-ndk-r25.2.9519653 ndk
 
       - name: Accept Android SDK licenses and install SDK components
         run: |
@@ -36,12 +44,12 @@ jobs:
           mv cmdline-tools latest
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.0" "ndk;25.2.9519653"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.0"
 
       - name: Set environment variables
         run: |
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/ndk" >> $GITHUB_ENV
           echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$HOME/android-sdk/emulator:$PATH" >> $GITHUB_ENV
 
       - name: Build APK (with retry)
