@@ -24,7 +24,7 @@ jobs:
       - name: Install Buildozer and dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools wheel
-          pip install buildozer cython numpy scikit-learn
+          pip install --upgrade buildozer cython numpy scikit-learn
 
       - name: Accept Android SDK licenses and install SDK components
         run: |
@@ -44,8 +44,11 @@ jobs:
           echo "ANDROID_NDK_HOME=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
           echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$HOME/android-sdk/emulator:$PATH" >> $GITHUB_ENV
 
-      - name: Build APK
-        run: buildozer -v android debug
+      - name: Build APK (with retry)
+        run: |
+          for i in 1 2 3; do
+            buildozer -v android debug && break || sleep 60
+          done
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
