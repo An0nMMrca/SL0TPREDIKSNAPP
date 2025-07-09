@@ -7,7 +7,7 @@ source.dir = .
 
 version = 1.0.0
 
-requirements = python3.10, kivy, cython, numpy, scikit-learn, sqlite3
+requirements = python3, kivy, cython, numpy, scikit-learn, sqlite3
 
 orientation = portrait
 fullscreen = 1
