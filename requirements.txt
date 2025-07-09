@@ -1,1 +1,3 @@
-
+kivy
+numpy
+scikit-learn
