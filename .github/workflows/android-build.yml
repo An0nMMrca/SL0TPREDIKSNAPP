@@ -9,6 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+      steps:
+      - name: Install tar if missing
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tar
+
+
     env:
       ANDROID_SDK_ROOT: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
       ANDROID_NDK_HOME: ${{ github.workspace }}/.buildozer/android/platform/android-ndk-r25b
