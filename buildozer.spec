@@ -17,6 +17,7 @@ warn_on_root = 1
 android.api = 34
 android.minapi = 21
 android.build_tools_version = 34.0.0
+android.sdk_path = /home/runner/android-sdk
 android.ndk = 25.2.9519653
 android.archs = armeabi-v7a, arm64-v8a
 android.permissions = INTERNET
