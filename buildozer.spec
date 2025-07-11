@@ -2,7 +2,6 @@
 title = G4mbler
 package.name = g4mbler
 package.domain = org.example
-source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 requirements = python3,kivy,numpy,cython
@@ -19,7 +18,6 @@ android.sdk = 24
 android.ndk = 25b
 
 # Use SDL2 bootstrap
-source.dir = .
 p4a.bootstrap = sdl2
 source.dir = .
 
