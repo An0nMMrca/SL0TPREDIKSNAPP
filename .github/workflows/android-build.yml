@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -18,44 +18,37 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install build dependencies
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y \
-            zip unzip openjdk-17-jdk \
-            python3-pip python3-setuptools python3-wheel \
-            libffi-dev libssl-dev libsqlite3-dev \
-            libjpeg-dev zlib1g-dev \
-            libncurses6 libstdc++6 clang
+          sudo apt install -y libffi-dev libssl-dev libjpeg-dev libfreetype6-dev libncurses5 zip unzip openjdk-17-jdk
 
-      - name: Install Buildozer and dependencies
+      - name: Install buildozer
         run: |
           pip install --upgrade pip
           pip install cython
           pip install buildozer
 
-      - name: Create Android SDK folders
-        run: |
-          mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-
       - name: Download Android command line tools
         run: |
-          cd ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-          curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip sdk-tools.zip
-          rm sdk-tools.zip
+          mkdir -p ~/.buildozer/android/platform
+          cd ~/.buildozer/android/platform
+          curl -o cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip cmdline-tools.zip
+          mkdir -p android-sdk/cmdline-tools/latest
+          mv cmdline-tools/* android-sdk/cmdline-tools/latest/
 
-      - name: Accept Android SDK licenses
+      - name: Accept SDK licenses
         run: yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-      - name: Install Android SDK packages
+      - name: Install SDK packages
         run: |
           ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
-            "platform-tools" \
             "platforms;android-34" \
             "build-tools;34.0.0" \
-            "ndk;25.2.9519653"
+            "ndk;25.2.9519653" \
+            "platform-tools" \
+            "tools"
 
-      - name: Build the APK with Buildozer
-        run: |
-          buildozer android debug
+      - name: Build APK
+        run: buildozer android debug
