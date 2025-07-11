@@ -32,7 +32,7 @@ jobs:
             zip \
             unzip \
             openjdk-17-jdk \
-            libncurses5 \
+            libncurses6 \
             libstdc++6 \
             python3-pip \
             python3-setuptools \
@@ -40,7 +40,6 @@ jobs:
             ccache \
             libffi-dev \
             libssl-dev \
-            libsqlite3-dev \
             zlib1g-dev \
             libjpeg-dev
 
