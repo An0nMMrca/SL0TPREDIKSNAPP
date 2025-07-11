@@ -16,9 +16,10 @@ warn_on_root = 1
 [app.android]
 android.api = 34
 android.minapi = 21
-android.build_tools_version = 34.0.0
-android.sdk_path = /home/runner/android-sdk
 android.ndk = 25.2.9519653
-android.archs = armeabi-v7a, arm64-v8a
+android.build_tools_version = 34.0.0
 android.permissions = INTERNET
+android.archs = armeabi-v7a, arm64-v8a
+android.sdk_path = $HOME/android-sdk
+android.ndk_path = $HOME/android-sdk/ndk/25.2.9519653
 android.add_assets = icons/
