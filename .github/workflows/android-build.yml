@@ -56,22 +56,15 @@ jobs:
       - name: Link SDK to Buildozer expected paths (fix AIDL + sdkmanager)
         run: |
           mkdir -p /home/runner/.buildozer/android/platform
-          ln -s $HOME/android-sdk /home/runner/.buildozer/android/platform/android-sdk
+          ln -sf $HOME/android-sdk /home/runner/.buildozer/android/platform/android-sdk
           mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
-          ln -s $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+          ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
-      - name: Build APK
-        run: buildozer android debug
+      - name: Clean previous builds
+        run: rm -rf .buildozer
 
-      - name: Decode keystore and sign APK
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > g4mbler-release-key.jks
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-            -keystore g4mbler-release-key.jks -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" \
-            bin/*.apk "$KEY_ALIAS"
+      - name: Show buildozer version
+        run: buildozer --version
 
-      - name: Upload signed APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: G4mbler-SIGNED-APK
-          path: bin/*.apk
+      - name: Build APK with verbose logs
+        run: buildozer -v android debug
