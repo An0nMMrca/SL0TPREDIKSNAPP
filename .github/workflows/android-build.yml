@@ -53,11 +53,16 @@ jobs:
           sdkmanager "platform-tools"
           sdkmanager "ndk;25.2.9519653"
 
+      - name: Link SDK to Buildozer expected path (AIDL fix)
+        run: |
+          mkdir -p /home/runner/.buildozer/android/platform
+          ln -s $HOME/android-sdk /home/runner/.buildozer/android/platform/android-sdk
+
       - name: Build APK
         run: buildozer android debug
-
-      - name: Upload APK
+    
+      - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: G4mbler-debug-apk
+          name: G4mbler-SIGNED-APK
           path: bin/*.apk
