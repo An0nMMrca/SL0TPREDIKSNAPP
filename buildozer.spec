@@ -24,7 +24,7 @@ android.sdk_path =
 android.gradle_dependencies = 
 android.gradle_plugins = 
 
-android.build_tools_version = 36.0.0
+android.build_tools_version = 34.0.0
 
 # Include your icons folder
 android.add_assets = icons/
