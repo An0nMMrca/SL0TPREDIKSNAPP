@@ -53,14 +53,23 @@ jobs:
           sdkmanager "platform-tools"
           sdkmanager "ndk;25.2.9519653"
 
-      - name: Link SDK to Buildozer expected path (AIDL fix)
+      - name: Link SDK to Buildozer expected paths (fix AIDL + sdkmanager)
         run: |
           mkdir -p /home/runner/.buildozer/android/platform
           ln -s $HOME/android-sdk /home/runner/.buildozer/android/platform/android-sdk
+          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
+          ln -s $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
       - name: Build APK
         run: buildozer android debug
-    
+
+      - name: Decode keystore and sign APK
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > g4mbler-release-key.jks
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+            -keystore g4mbler-release-key.jks -storepass "$KEYSTORE_PASSWORD" -keypass "$KEY_PASSWORD" \
+            bin/*.apk "$KEY_ALIAS"
+
       - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
