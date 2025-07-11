@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+          python-version: 3.10
 
       - name: Install system dependencies
         run: |
@@ -25,17 +25,17 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Install Android SDK
+      - name: Install Android SDK command line tools
         run: |
-          mkdir -p $HOME/android-sdk
+          mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d android-sdk/
-          mv android-sdk/cmdline-tools android-sdk/cmdline-tools-temp
+          unzip cmdline-tools.zip -d android-sdk/cmdline-tools-temp
           mkdir -p android-sdk/cmdline-tools/latest
           mv android-sdk/cmdline-tools-temp/* android-sdk/cmdline-tools/latest/
+          rm cmdline-tools.zip
 
-      - name: Set environment variables
+      - name: Set environment variables for Android SDK
         run: |
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
@@ -43,28 +43,42 @@ jobs:
           echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
           echo "$HOME/android-sdk/emulator" >> $GITHUB_PATH
 
-      - name: Accept Android licenses
+      - name: Accept all Android SDK licenses
         run: yes | sdkmanager --licenses
 
-      - name: Install Android packages
+      - name: Install required Android SDK packages
         run: |
           sdkmanager "platforms;android-34"
           sdkmanager "build-tools;34.0.0"
           sdkmanager "platform-tools"
           sdkmanager "ndk;25.2.9519653"
 
-      - name: Link SDK to Buildozer expected paths (fix AIDL + sdkmanager)
+      - name: Set Android environment variables used by Buildozer
+        run: |
+          echo "ANDROIDAPI=34" >> $GITHUB_ENV
+          echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
+          echo "ANDROIDNDK=25.2.9519653" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+          echo "ANDROID_NDK=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
+
+      - name: Verify SDK and NDK installation folders
+        run: |
+          ls -l $HOME/android-sdk/platforms/android-34
+          ls -l $HOME/android-sdk/build-tools/34.0.0
+          ls -l $HOME/android-sdk/ndk/25.2.9519653
+
+      - name: Link SDK folders for Buildozer compatibility
         run: |
           mkdir -p /home/runner/.buildozer/android/platform
           ln -sf $HOME/android-sdk /home/runner/.buildozer/android/platform/android-sdk
           mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
           ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
-      - name: Clean previous builds
+      - name: Clean previous build data
         run: rm -rf .buildozer
 
-      - name: Show buildozer version
+      - name: Show Buildozer version
         run: buildozer --version
 
-      - name: Build APK with verbose logs
+      - name: Build APK (verbose)
         run: buildozer -v android debug
