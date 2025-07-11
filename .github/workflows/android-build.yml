@@ -2,15 +2,15 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -18,53 +18,37 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Install system dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y zip unzip openjdk-17-jdk python3-pip wget
+          sudo apt-get install -y zip unzip openjdk-17-jdk python3-pip python3-setuptools python3-wheel
           pip install --upgrade pip
-          pip install buildozer cython
+          pip install cython buildozer
 
-      - name: Install Android SDK command line tools
+      - name: Download Android Command Line Tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d android-sdk/cmdline-tools-temp
-          mkdir -p android-sdk/cmdline-tools/latest
-          mv android-sdk/cmdline-tools-temp/cmdline-tools/* android-sdk/cmdline-tools/latest/
-          rm cmdline-tools.zip
+          cd $HOME/android-sdk/cmdline-tools
+          curl -o tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip tools.zip -d temp
+          mv temp/cmdline-tools latest
+          rm -rf tools.zip temp
 
-      - name: Accept Android SDK licenses
+      - name: Set environment variables
+        run: |
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+          echo "$HOME/.buildozer/android/platform/apache-ant-1.9.4/bin" >> $GITHUB_PATH
+
+      - name: Accept licenses
         run: yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
-      - name: Install required Android SDK packages
+      - name: Install Android SDK components
         run: |
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34"
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0"
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "ndk;25.2.9519653"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;25.2.9519653"
 
-      - name: Set Android environment variables for Buildozer
+      - name: Build with Buildozer
         run: |
-          echo "ANDROIDAPI=34" >> $GITHUB_ENV
-          echo "ANDROIDMINAPI=21" >> $GITHUB_ENV
-          echo "ANDROIDNDK=25.2.9519653" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
-          echo "ANDROID_NDK=$HOME/android-sdk/ndk/25.2.9519653" >> $GITHUB_ENV
-
-      - name: Link SDK folders for Buildozer
-        run: |
-          mkdir -p /home/runner/.buildozer/android/platform
-          ln -sf $HOME/android-sdk /home/runner/.buildozer/android/platform/android-sdk
-          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
-          ln -sf $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
-
-      - name: Clean previous build data
-        run: rm -rf .buildozer
-
-      - name: Show Buildozer version
-        run: buildozer --version
-
-      - name: Build APK
-        run: buildozer -v android debug
+          buildozer android debug
