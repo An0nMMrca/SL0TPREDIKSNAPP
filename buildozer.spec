@@ -16,9 +16,10 @@ android.api = 31
 android.minapi = 21
 android.sdk = 24
 android.ndk = 25b
-
+source.dir = .
 # Use SDL2 bootstrap
-android.bootstrap = sdl2
+p4a.bootstrap = sdl2
+
 
 # Allow multiple architectures
 android.archs = armeabi-v7a, arm64-v8a
