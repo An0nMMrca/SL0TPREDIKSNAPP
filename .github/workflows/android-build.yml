@@ -35,18 +35,15 @@ jobs:
           mv android-sdk/cmdline-tools-temp/* android-sdk/cmdline-tools/latest/
           rm cmdline-tools.zip
 
-      - name: Add sdkmanager to PATH
-        run: echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+        run: yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Install required Android SDK packages
         run: |
-          sdkmanager "platforms;android-34"
-          sdkmanager "build-tools;34.0.0"
-          sdkmanager "platform-tools"
-          sdkmanager "ndk;25.2.9519653"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platform-tools"
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "ndk;25.2.9519653"
 
       - name: Set Android environment variables for Buildozer
         run: |
