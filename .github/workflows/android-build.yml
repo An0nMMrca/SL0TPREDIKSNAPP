@@ -4,59 +4,38 @@ on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
+      ANDROID_SDK_ROOT: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
+      ANDROID_NDK_HOME: ${{ github.workspace }}/.buildozer/android/platform/android-ndk-r25b
       ANDROID_API: 31
-      ANDROID_MINAPI: 21
-      ANDROID_SDK_VERSION: 24
-      ANDROID_NDK_VERSION: 25b
+      ANDROID_MIN_API: 21
+      JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64
+      PATH: /usr/lib/jvm/temurin-17-jdk-amd64/bin:${{ github.workspace }}/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
+      - name: Update apt and install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libncurses6 libstdc++6 libffi-dev libssl-dev openjdk-17-jdk unzip
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential \
-          git \
-          tar
-          python3-pip \
-          openjdk-17-jdk \
-          unzip \
-          libncurses6
+      - name: Setup Python and install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install buildozer cython kivy numpy 
 
-    - name: Upgrade pip and install buildozer & p4a
-      run: |
-        pip install --upgrade pip
-        pip install --upgrade buildozer python-for-android
+      - name: Build APK
+        run: |
+          buildozer android debug
 
-    - name: Initialize Android SDK
-      run: |
-        buildozer android sdk
-
-    - name: Accept all Android SDK licenses
-      run: |
-        yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
-    - name: Clean previous build artifacts
-      run: buildozer android clean
-
-    - name: Build APK
-      run: buildozer -v android debug
-
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: g4mbler-apk
-        path: bin/*.apk
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk
+          path: bin/*.apk
