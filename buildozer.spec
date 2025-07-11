@@ -5,7 +5,7 @@ package.domain = org.kartice.ai
 source.dir = .
 source.include_exts = py,png,jpg,kv,ttf,db
 version = 1.0
-requirements = python3,kivy,numpy,scikit-learn,sqlite3,cython
+requirements = python3,kivy,numpy,scikit-learn,cython
 icon.filename = icons/app_icon.png
 fullscreen = 1
 
@@ -25,6 +25,7 @@ warn_on_root = 1
 android.api = 34
 android.minapi = 21
 android.ndk = 25b
+android.sdk = 24
 android.sdk_path = ~/.buildozer/android/platform/android-sdk
 android.ndk_path = ~/.buildozer/android/platform/android-ndk-r25b
 android.archs = armeabi-v7a, arm64-v8a
