@@ -32,7 +32,7 @@ jobs:
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
           unzip cmdline-tools.zip -d android-sdk/cmdline-tools-temp
           mkdir -p android-sdk/cmdline-tools/latest
-          mv android-sdk/cmdline-tools-temp/* android-sdk/cmdline-tools/latest/
+          mv android-sdk/cmdline-tools-temp/cmdline-tools/* android-sdk/cmdline-tools/latest/
           rm cmdline-tools.zip
 
       - name: Accept Android SDK licenses
