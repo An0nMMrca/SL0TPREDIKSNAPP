@@ -1,28 +1,46 @@
 [app]
+
+# Osnovno
 title = G4mbler
 package.name = g4mbler
 package.domain = org.example
-source.include_exts = py,png,jpg,kv,atlas
+source.dir = .
+
+# Verzija
 version = 0.1
+
+# Ekstenzije koje se uključuju
+source.include_exts = py,png,jpg,kv,atlas
+
+# Zahtevi
 requirements = python3,kivy,numpy,cython
+
+# Orijentacija i fullscreen
 orientation = portrait
 fullscreen = 1
 
-# (Opcioni) Ikonice i splash
-icon.filename = %(source.dir)s/icons/icon.png
+# Ikonica
+icon.filename = icons/icon.png
 
-# Android specifično
-android.api = 31
+# Android podešavanja
+android.api = 33
 android.minapi = 21
-android.sdk = 24
+android.build_tools_version = 33.0.0
 android.ndk = 25b
+android.permissions = INTERNET
 
-# Use SDL2 bootstrap
+# Bootstrap
 p4a.bootstrap = sdl2
-source.dir = .
 
-
-# Allow multiple architectures
+# Arhitekture
 android.archs = armeabi-v7a, arm64-v8a
 
-# Ostalo po potrebi
+# Log nivo
+log_level = 2
+
+# Kopiraj main.py i ceo source
+copy_mainsource = 1
+
+# Buildozer build folder
+[buildozer]
+build_dir = ./.buildozer
