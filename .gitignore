@@ -6,8 +6,6 @@ __pycache__/
 
 # Buildozer i Kivy build folderi
 .buildozer/
-bin/
-*.apk
 
 # IDE fajlovi (Visual Studio Code, JetBrains)
 .vscode/
